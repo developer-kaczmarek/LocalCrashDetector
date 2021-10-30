@@ -5,7 +5,7 @@
     <application>
 
         <activity
-            android:name=".ui.CrashesListActivity"
+            android:name=".ui.crashes_list.CrashesListActivity"
             android:label="@string/library_name"
             android:launchMode="singleTask"
             android:taskAffinity="io.github.kaczmarek.localcrashdetector.task"
@@ -19,7 +19,7 @@
             android:label="@string/library_name"
             android:logo="@mipmap/ic_library_launcher"
             android:roundIcon="@mipmap/ic_library_launcher_round"
-            android:targetActivity=".ui.CrashesListActivity"
+            android:targetActivity=".ui.crashes_list.CrashesListActivity"
             android:taskAffinity="io.github.kaczmarek.localcrashdetector.task"
             android:theme="@style/LocalCrashDetector.AppTheme">
 

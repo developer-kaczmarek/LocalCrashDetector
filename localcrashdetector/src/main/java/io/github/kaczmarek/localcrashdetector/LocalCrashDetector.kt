@@ -9,7 +9,7 @@ import android.os.Build
 import android.text.TextUtils
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import io.github.kaczmarek.localcrashdetector.ui.CrashesListActivity
+import io.github.kaczmarek.localcrashdetector.ui.crashes_list.CrashesListActivity
 import java.io.*
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -32,7 +32,7 @@ object LocalCrashDetector {
             return dateFormat.format(Date())
         }
 
-    private val defaultPath: String
+    val defaultPath: String
         get() {
             val defaultPath: String = context.getExternalFilesDir(null)?.absolutePath
                 .toString() + File.separator + CRASH_REPORT_DIR
