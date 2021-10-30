@@ -1,0 +1,11 @@
+<resources>
+    <string name="library_name">Local Crash Detector</string>
+
+    <string name="activity_crash_list_description">App: %s</string>
+
+    <string name="local_crash_detector_notify_description">Новый сбой. Узнать подробности можно здесь.</string>
+
+    <string name="local_crash_detector_channel_notify_id">local_crash_detector_notify_id</string>
+    <string name="local_crash_detector_channel_notify_name">Local Crash Detector Notify</string>
+    <string name="local_crash_detector_channel_notify_description">Информирует о новых локальных сбоях.</string>
+</resources>

@@ -1,0 +1,9 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="LocalCrashDetector.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimaryDark">@color/red_bc0</item>
+        <item name="colorPrimary">@color/red_bc0</item>
+        <item name="colorAccent">@color/red_bc0</item>
+    </style>
+</resources>
