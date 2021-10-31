@@ -18,7 +18,8 @@ data class CrashItem(
     val time: String,
     val previewInfo: String,
     val fullInfo: String,
-    val device: DeviceDetails
+    val device: DeviceDetails,
+    val path: String
 )
 
 data class DeviceDetails(
@@ -72,7 +73,7 @@ class CrashesListViewModel : ViewModel() {
                         val fullInfo = readAllInfoCrashReason(it)
                         val deviceDetails = getDeviceDetails()
 
-                        CrashItem(time, previewInfo, fullInfo, deviceDetails)
+                        CrashItem(time, previewInfo, fullInfo, deviceDetails, it.absolutePath)
                     } ?: emptyList()
                 )
             }

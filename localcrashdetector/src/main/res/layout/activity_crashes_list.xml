@@ -60,6 +60,12 @@
                     android:id="@+id/tv_details_device_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
+
+                <Button
+                    android:id="@+id/btn_share_file"
+                    android:text="Поделиться"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
