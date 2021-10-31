@@ -1,5 +1,6 @@
 package io.github.kaczmarek.localcrashdetector.ui.crashes_list
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.kaczmarek.localcrashdetector.LocalCrashDetector
@@ -11,10 +12,21 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.lang.RuntimeException
+import java.lang.StringBuilder
 
 data class CrashItem(
     val time: String,
-    val info: String
+    val previewInfo: String,
+    val fullInfo: String,
+    val device: DeviceDetails
+)
+
+data class DeviceDetails(
+    val manufacturer: String,
+    val model: String,
+    val android: String,
+    val apiLevel: String,
+    val board: String
 )
 
 sealed class Result {
@@ -25,6 +37,7 @@ sealed class Result {
 }
 
 class CrashesListViewModel : ViewModel() {
+
     private val _uiState = MutableStateFlow<Result>(Result.Loading)
     val uiState: StateFlow<Result> = _uiState
 
@@ -43,13 +56,6 @@ class CrashesListViewModel : ViewModel() {
         }
     }
 
-    private fun readCrashReason(file: File): String {
-        val reader = BufferedReader(FileReader(file))
-        val firstLine = reader.readLine()
-        reader.close()
-        return firstLine
-    }
-
     private suspend fun getCrashItems(): List<CrashItem> {
         val crashes = arrayListOf<CrashItem>()
         coroutineScope {
@@ -62,12 +68,43 @@ class CrashesListViewModel : ViewModel() {
                 crashes.addAll(
                     directory.listFiles()?.map {
                         val time = it.name.removeSuffix(".txt")
-                        val info = readCrashReason(it)
-                        CrashItem(time, info)
+                        val previewInfo = readPreviewCrashReason(it)
+                        val fullInfo = readAllInfoCrashReason(it)
+                        val deviceDetails = getDeviceDetails()
+
+                        CrashItem(time, previewInfo, fullInfo, deviceDetails)
                     } ?: emptyList()
                 )
             }
         }
         return crashes
     }
+
+    private fun readPreviewCrashReason(file: File): String {
+        val reader = BufferedReader(FileReader(file))
+        val firstLine = reader.readLine()
+        reader.close()
+        return firstLine
+    }
+
+    private fun readAllInfoCrashReason(file: File?): String {
+        val crash = StringBuilder()
+        val reader = BufferedReader(FileReader(file))
+        var line: String?
+        while (reader.readLine().also { line = it } != null) {
+            crash.append(line)
+            crash.append('\n')
+        }
+        reader.close()
+        return crash.toString()
+    }
+
+    private fun getDeviceDetails(): DeviceDetails =
+        DeviceDetails(
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            android = Build.VERSION.RELEASE,
+            apiLevel = Build.VERSION.SDK_INT.toString(),
+            board = Build.BOARD
+        )
 }
