@@ -3,6 +3,9 @@ package io.github.kaczmarek.localcrashdetector.ui.crashes_list
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
@@ -10,26 +13,48 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.github.kaczmarek.localcrashdetector.R
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class CrashesListActivity : AppCompatActivity() {
+class CrashesListActivity : AppCompatActivity(), OnClickCrashItemListener {
 
     private lateinit var vm: CrashesListViewModel
+    private lateinit var tvFullCrashReason: TextView
+    private lateinit var tvDeviceDetails: TextView
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
+    private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+
+        override fun onStateChanged(bottomSheet: View, newState: Int) {}
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crashes_list)
-
         vm = ViewModelProvider(this)[CrashesListViewModel::class.java]
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         val rvCrashesList = findViewById<RecyclerView>(R.id.rv_crashes_list)
+        val flCrashDetailsBottomSheet =
+            findViewById<FrameLayout>(R.id.fl_crash_details_bottom_sheet)
+        tvFullCrashReason = findViewById(R.id.tv_details_full_info)
+        tvDeviceDetails = findViewById(R.id.tv_details_device_info)
+        bottomSheetBehavior = BottomSheetBehavior.from(flCrashDetailsBottomSheet)
+
         toolbar.subtitle = getString(
             R.string.activity_crash_list_description,
             getApplicationName()
         )
+        val rvAdapter = CrashListRvAdapter().apply {
+            listener = this@CrashesListActivity
+        }
+        rvCrashesList.adapter = rvAdapter
+
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetCallback)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -37,7 +62,7 @@ class CrashesListActivity : AppCompatActivity() {
                     when (result) {
                         is Result.Loading -> Log.i(TAG, "Loading")
 
-                        is Result.Success -> rvCrashesList.adapter = CrashListRvAdapter(result.data)
+                        is Result.Success -> rvAdapter.update(result.data)
 
                         is Error -> Log.i(TAG, "Error = ${result.message}")
 
@@ -46,6 +71,28 @@ class CrashesListActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
+        super.onDestroy()
+    }
+
+    override fun onClick(item: CrashItem) {
+        showDetails(item.fullInfo, item.device)
+    }
+
+    private fun showDetails(crashReason: String, device: DeviceDetails) {
+        tvFullCrashReason.text = crashReason
+        tvDeviceDetails.text = getString(
+            R.string.activity_crash_device_details,
+            device.manufacturer,
+            device.model,
+            device.android,
+            device.apiLevel,
+            device.board
+        )
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun getApplicationName(): String {
