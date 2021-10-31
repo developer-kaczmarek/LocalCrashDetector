@@ -2,6 +2,7 @@
     <string name="library_name">Local Crash Detector</string>
 
     <string name="activity_crash_list_description">App: %s</string>
+    <string name="activity_crash_details_share">Поделиться</string>
     <string name="activity_crash_device_details">manufacturer : %s \nmodel : %s \nandroid : %s \napi level : %s \nboard : %s</string>
 
     <string name="local_crash_detector_notify_description">Новый сбой. Узнать подробности можно здесь.</string>
